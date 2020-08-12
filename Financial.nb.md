@@ -269,17 +269,21 @@ head(df_num)</code></pre>
 
 
 <pre class="r"><code class="hljs">set.seed(<span class="hljs-number">0</span>)
-test_index &lt;- createDataPartition(df_num$isFraud, times = <span class="hljs-number">1</span>, p = <span class="hljs-number">0.2</span>, list = <span class="hljs-literal">FALSE</span>) <span class="hljs-comment"># first create the indexes for the test set</span>
+test_index &lt;- createDataPartition(df_num$isFraud, times = <span class="hljs-number">1</span>, p = <span class="hljs-number">0.2</span>, list = <span class="hljs-literal">FALSE</span>) <span class="hljs-comment"># first create the indexes for the test set
+</span>
 
-<span class="hljs-comment"># select our test set</span>
+<span class="hljs-comment"># select our test set
+</span>
 test_x &lt;- select(df_num, -isFraud)[test_index,]
 test_y &lt;- df_num$isFraud[test_index]
 
-<span class="hljs-comment"># select the reamining indexes for our train set</span>
+<span class="hljs-comment"># select the reamining indexes for our train set
+</span>
 train_x &lt;- select(df_num, -isFraud)[-test_index,]
 train_y &lt;- df_num$isFraud[-test_index]
 
-<span class="hljs-comment"># change de training data as factor because we will only have to values</span>
+<span class="hljs-comment"># change de training data as factor because we will only have to values
+</span>
 train_y &lt;- as.factor(train_y)</code></pre>
 
 
@@ -293,12 +297,15 @@ train_y &lt;- as.factor(train_y)</code></pre>
 
 
 <pre class="r"><code class="hljs">predict_kmeans &lt;- <span class="hljs-keyword">function</span>(x, k) {
-    centers &lt;- k$centers    <span class="hljs-comment"># extract cluster centers</span>
-    <span class="hljs-comment"># calculate distance to cluster centers</span>
+    centers &lt;- k$centers    <span class="hljs-comment"># extract cluster centers
+</span>
+    <span class="hljs-comment"># calculate distance to cluster centers
+</span>
     distances &lt;- sapply(<span class="hljs-number">1</span>:nrow(x), <span class="hljs-keyword">function</span>(i){
                         apply(centers, <span class="hljs-number">1</span>, <span class="hljs-keyword">function</span>(y) dist(rbind(x[i,], y)))
                  })
-  max.col(-t(distances))  <span class="hljs-comment"># select cluster with min distance to center</span>
+  max.col(-t(distances))  <span class="hljs-comment"># select cluster with min distance to center
+</span>
 }
 set.seed(<span class="hljs-number">0</span>)
 k &lt;- kmeans(train_x, centers = <span class="hljs-number">2</span>)
@@ -311,7 +318,8 @@ kmeans_preds &lt;- ifelse(predict_kmeans(test_x, k) == <span class="hljs-number"
 
 
 
-<pre class="r"><code class="hljs">results &lt;- data_frame(method = <span class="hljs-string">"K means"</span>, accuracy = mean(kmeans_preds == test_y)) <span class="hljs-comment"># save the results in the data frame</span>
+<pre class="r"><code class="hljs">results &lt;- data_frame(method = <span class="hljs-string">"K means"</span>, accuracy = mean(kmeans_preds == test_y)) <span class="hljs-comment"># save the results in the data frame
+</span>
 results %&gt;% knitr::kable()</code></pre>
 
 
@@ -346,11 +354,13 @@ results %&gt;% knitr::kable()</code></pre>
 
 
 <pre class="r"><code class="hljs">set.seed(<span class="hljs-number">0</span>)
-<span class="hljs-comment"># Train the model</span>
+<span class="hljs-comment"># Train the model
+</span>
 train_glm &lt;- train(train_x, train_y,
                      method = <span class="hljs-string">"glm"</span>)
 
-<span class="hljs-comment"># Predict for the test set</span>
+<span class="hljs-comment"># Predict for the test set
+</span>
 glm_preds &lt;- predict(train_glm, test_x)
 <span class="hljs-comment"># mean(glm_preds == test_y)</span></code></pre>
 
@@ -360,7 +370,8 @@ glm_preds &lt;- predict(train_glm, test_x)
 
 
 
-<pre class="r"><code class="hljs">results &lt;- bind_rows(results, <span class="hljs-comment"># add accuracy to the df</span>
+<pre class="r"><code class="hljs">results &lt;- bind_rows(results, <span class="hljs-comment"># add accuracy to the df
+</span>
                           data_frame(method=<span class="hljs-string">"Logistic regression"</span>,
                                      accuracy = mean(glm_preds == test_y)))
 results %&gt;% knitr::kable()</code></pre>
@@ -401,11 +412,13 @@ results %&gt;% knitr::kable()</code></pre>
 
 
 <pre class="r"><code class="hljs">set.seed(<span class="hljs-number">0</span>)
-<span class="hljs-comment"># Train the model</span>
+<span class="hljs-comment"># Train the model
+</span>
 train_lda &lt;- train(train_x, train_y,
                      method = <span class="hljs-string">"lda"</span>)
 
-<span class="hljs-comment"># Predict for the test set</span>
+<span class="hljs-comment"># Predict for the test set
+</span>
 lda_preds &lt;- predict(train_lda, test_x)
 <span class="hljs-comment"># mean(lda_preds == test_y)</span></code></pre>
 
@@ -415,7 +428,8 @@ lda_preds &lt;- predict(train_lda, test_x)
 
 
 
-<pre class="r"><code class="hljs">results &lt;- bind_rows(results, <span class="hljs-comment"># add accuracy to the df</span>
+<pre class="r"><code class="hljs">results &lt;- bind_rows(results, <span class="hljs-comment"># add accuracy to the df
+</span>
                           data_frame(method=<span class="hljs-string">"LDA"</span>,
                                      accuracy = mean(lda_preds == test_y)))
 results %&gt;% knitr::kable()</code></pre>
@@ -460,13 +474,16 @@ results %&gt;% knitr::kable()</code></pre>
 
 
 <pre class="r"><code class="hljs">set.seed(<span class="hljs-number">0</span>)
-<span class="hljs-comment"># Train the model</span>
+<span class="hljs-comment"># Train the model
+</span>
 train_knn &lt;- train(train_x, train_y,
                      method = <span class="hljs-string">"knn"</span>,
                      tuneGrid = data.frame(k = seq(<span class="hljs-number">1.95</span>, <span class="hljs-number">2</span>, <span class="hljs-number">0.01</span>)))
-<span class="hljs-comment"># Predict for the test set</span>
+<span class="hljs-comment"># Predict for the test set
+</span>
 knn_preds &lt;- predict(train_knn, test_x)
-<span class="hljs-comment"># mean(knn_preds == test_y)</span>
+<span class="hljs-comment"># mean(knn_preds == test_y)
+</span>
 <span class="hljs-comment"># train_knn$bestTune %&gt;% pull()</span></code></pre>
 
 
@@ -475,7 +492,8 @@ knn_preds &lt;- predict(train_knn, test_x)
 
 
 
-<pre class="r"><code class="hljs">results &lt;- bind_rows(results, <span class="hljs-comment"># add accuracy to the df</span>
+<pre class="r"><code class="hljs">results &lt;- bind_rows(results, <span class="hljs-comment"># add accuracy to the df
+</span>
                           data_frame(method=<span class="hljs-string">"KNN"</span>,
                                      accuracy = mean(knn_preds == test_y),
                                      tune = train_knn$bestTune %&gt;% pull()))
@@ -546,14 +564,17 @@ results %&gt;% knitr::kable()</code></pre>
 
 
 <pre class="r"><code class="hljs">set.seed(<span class="hljs-number">0</span>)
-<span class="hljs-comment"># Train the model</span>
+<span class="hljs-comment"># Train the model
+</span>
 train_rf &lt;- train(train_x, train_y,
                   method = <span class="hljs-string">"rf"</span>,
                   tuneGrid = data.frame(mtry = seq(<span class="hljs-number">5.4</span>,<span class="hljs-number">5.6</span>,<span class="hljs-number">0.1</span>)),
                   importance = <span class="hljs-literal">TRUE</span>)
-<span class="hljs-comment"># Predict for the test set</span>
+<span class="hljs-comment"># Predict for the test set
+</span>
 rf_preds &lt;- predict(train_rf, test_x)
-<span class="hljs-comment"># mean(rf_preds == test_y)</span>
+<span class="hljs-comment"># mean(rf_preds == test_y)
+</span>
 <span class="hljs-comment"># train_rf$bestTune %&gt;% pull()</span></code></pre>
 
 
@@ -562,7 +583,8 @@ rf_preds &lt;- predict(train_rf, test_x)
 
 
 
-<pre class="r"><code class="hljs">results &lt;- bind_rows(results, <span class="hljs-comment"># add accuracy to the df</span>
+<pre class="r"><code class="hljs">results &lt;- bind_rows(results, <span class="hljs-comment"># add accuracy to the df
+</span>
                           data_frame(method=<span class="hljs-string">"RF"</span>,
                                      accuracy = mean(rf_preds == test_y),
                                      tune = train_rf$bestTune %&gt;% pull()))
@@ -724,7 +746,8 @@ data.frame(Model = models, Accuracy = accuracy) %&gt;% knitr::kable()</code></pr
 
 
 
-<pre class="r"><code class="hljs"><span class="hljs-comment">#kmeans_preds_num &lt;- ifelse(kmeans_preds == "B", 1, 2)</span>
+<pre class="r"><code class="hljs"><span class="hljs-comment">#kmeans_preds_num &lt;- ifelse(kmeans_preds == "B", 1, 2)
+</span>
 models &lt;- matrix(c(glm_preds, knn_preds, rf_preds), ncol = <span class="hljs-number">3</span>)
 
 ensemble_preds &lt;- ifelse(rowMedians(models) == <span class="hljs-number">1</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>)
@@ -769,7 +792,8 @@ data.frame(Model = models, Accuracy = accuracy) %&gt;% knitr::kable()</code></pr
 
 
  </p>
-<pre class="r"><code class="hljs">results &lt;- bind_rows(results, <span class="hljs-comment"># add accuracy to the df</span>
+<pre class="r"><code class="hljs">results &lt;- bind_rows(results, <span class="hljs-comment"># add accuracy to the df
+</span>
                           data_frame(method=<span class="hljs-string">"Ensemble"</span>,
                                      accuracy = mean(ensemble_preds == test_y)))</code></pre>
 
